@@ -129,7 +129,7 @@ GO
 CREATE TABLE [dbo].[Works](
 	[WorkId] [int] IDENTITY(1,1) NOT NULL,
 	[BylineId] [int] NOT NULL,
-	[Title] [nvarchar](200) NOT NULL,
+	[Title] [nvarchar](500) NOT NULL,
 	[Type] [nvarchar](50) NULL,
 	[GenreId] [int] NULL,
 PRIMARY KEY CLUSTERED 
