@@ -13,7 +13,7 @@ public partial class Submission
 
     public int? MarketId { get; set; }
 
-    public DateOnly? SubmissionDate { get; set; }
+    public DateTime? SubmissionDate { get; set; }
 
     public string? Status { get; set; }
 
@@ -24,4 +24,11 @@ public partial class Submission
     public bool? SelfPublished { get; set; }
 
     public bool? Royalty { get; set; }
+
+
+    // Navigation
+    public Work Work { get; set; }
+    public Market Market { get; set; }
+
+
 }

@@ -1,7 +1,15 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using ScribeTrax.Context;
+using ScribeTrax.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddDbContext<ScribeTraxDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("ScribeTraxDb")));
 
 var app = builder.Build();
 
