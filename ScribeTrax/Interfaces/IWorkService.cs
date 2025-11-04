@@ -1,6 +1,6 @@
 ﻿using ScribeTrax.Models;
 
-namespace ScribeTrax.Services
+namespace ScribeTrax.Interfaces
 {
     public interface IWorkService
     {

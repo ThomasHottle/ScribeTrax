@@ -13,6 +13,10 @@ builder.Services.AddDbContext<ScribeTraxDbContext>(options =>
 
 var app = builder.Build();
 
+builder.Services.AddScoped<WorkService>();
+builder.Services.AddScoped<IMarketService, MarketService>();
+
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
