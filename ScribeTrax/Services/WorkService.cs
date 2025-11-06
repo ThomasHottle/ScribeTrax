@@ -1,10 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ScribeTrax.Models;
 using ScribeTrax.Context;
+using ScribeTrax.Interfaces;
+using ScribeTrax.Models;
 
 namespace ScribeTrax.Services
 {
-    public class WorkService
+    public class WorkService : IWorkService
     {
         private readonly ScribeTraxDbContext _context;
 
@@ -12,8 +13,6 @@ namespace ScribeTrax.Services
         {
             _context = context;
         }
-
-
 
         public WorkViewModel GetWorkById(int id)
         {
@@ -50,6 +49,59 @@ namespace ScribeTrax.Services
                 LastSubmittedDate = lastSubmittedDate,
                 MostRecentMarketName = mostRecentMarketName
             };
+        }
+
+        public IEnumerable<WorkViewModel> GetAllWorks()
+        {
+            return _context.Works
+                .Include(w => w.Byline)
+                .Include(w => w.Genre)
+                .OrderBy(w => w.Title)
+                .Select(work => new WorkViewModel
+                {
+                    WorkId = work.WorkId,
+                    Title = work.Title,
+                    Type = work.Type,
+                    BylineId = work.BylineId,
+                    BylineName = work.Byline.Name,
+                    GenreId = work.GenreId,
+                    GenreName = work.Genre.Name,
+                    SubmissionCount = _context.Submissions.Count(s => s.WorkId == work.WorkId),
+                    HasPayments = _context.Payments.Any(p => p.WorkId == work.WorkId),
+                    LastSubmittedDate = _context.Submissions
+                        .Where(s => s.WorkId == work.WorkId)
+                        .OrderByDescending(s => s.SubmissionDate)
+                        .Select(s => s.SubmissionDate)
+                        .FirstOrDefault(),
+                    MostRecentMarketName = _context.Submissions
+                        .Where(s => s.WorkId == work.WorkId)
+                        .OrderByDescending(s => s.SubmissionDate)
+                        .Select(s => s.Market.Name)
+                        .FirstOrDefault()
+                })
+                .ToList();
+        }
+
+        public void CreateWork(Work work)
+        {
+            _context.Works.Add(work);
+            _context.SaveChanges();
+        }
+
+        public void UpdateWork(Work work)
+        {
+            _context.Works.Update(work);
+            _context.SaveChanges();
+        }
+
+        public void DeleteWork(int id)
+        {
+            var work = _context.Works.Find(id);
+            if (work != null)
+            {
+                _context.Works.Remove(work);
+                _context.SaveChanges();
+            }
         }
     }
 }
