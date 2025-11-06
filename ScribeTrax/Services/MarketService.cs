@@ -45,5 +45,29 @@ namespace ScribeTrax.Services
                 })
                 .ToList();
         }
+
+        public void UpdateMarket(MarketViewModel model)
+        {
+            var entity = _context.Markets.FirstOrDefault(m => m.MarketId == model.MarketId);
+            if (entity == null) return;
+
+            entity.Name = model.Name;
+            entity.Editor = model.Editor;
+            entity.Type = model.Type;
+            entity.Email = model.Email;
+            entity.Url = model.Url;
+            entity.Postal = model.Postal;
+
+            _context.SaveChanges();
+        }
+
+        public void DeleteMarket(int id)
+        {
+            var entity = _context.Markets.FirstOrDefault(m => m.MarketId == id);
+            if (entity == null) return;
+
+            _context.Markets.Remove(entity);
+            _context.SaveChanges();
+        }
     }
 }

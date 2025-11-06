@@ -6,5 +6,7 @@ namespace ScribeTrax.Services
     {
         MarketViewModel GetMarketById(int id);
         IEnumerable<MarketViewModel> GetAllMarkets();
+        void UpdateMarket(MarketViewModel model);
+        void DeleteMarket(int id);
     }
 }
