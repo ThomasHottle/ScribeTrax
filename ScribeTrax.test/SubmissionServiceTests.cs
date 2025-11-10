@@ -67,4 +67,58 @@ public class SubmissionServiceTests
         var result = service.GetSubmissionById(1);
 
         result.Should().NotBeNull();
-        result.WorkTitle.Should().Be("Te
+        result.WorkTitle.Should().Be("Teaser");
+        result.GenreName.Should().Be("Fusion");
+        result.BylineName.Should().Be("Tommy Bolin");
+        result.MarketName.Should().Be("Jazz Monthly");
+        result.IsPaid.Should().BeTrue();
+    }
+
+    [Fact]
+    public void CreateSubmission_AddsEntityAndSaves()
+    {
+        var mockSet = new Mock<DbSet<Submission>>();
+        var mockContext = new Mock<ScribeTraxDbContext>();
+        mockContext.Setup(c => c.Submissions).Returns(mockSet.Object);
+
+        var service = new SubmissionService(mockContext.Object);
+        var submission = new Submission { SubmissionId = 2, WorkId = 1, MarketId = 2 };
+
+        service.CreateSubmission(submission);
+
+        mockSet.Verify(m => m.Add(It.IsAny<Submission>()), Times.Once);
+        mockContext.Verify(m => m.SaveChanges(), Times.Once);
+    }
+
+    [Fact]
+    public void UpdateSubmission_UpdatesEntityAndSaves()
+    {
+        var mockSet = new Mock<DbSet<Submission>>();
+        var mockContext = new Mock<ScribeTraxDbContext>();
+        mockContext.Setup(c => c.Submissions).Returns(mockSet.Object);
+
+        var service = new SubmissionService(mockContext.Object);
+        var submission = new Submission { SubmissionId = 1, WorkId = 1 };
+
+        service.UpdateSubmission(submission);
+
+        mockSet.Verify(m => m.Update(submission), Times.Once);
+        mockContext.Verify(m => m.SaveChanges(), Times.Once);
+    }
+
+    [Fact]
+    public void DeleteSubmission_RemovesEntityAndSaves()
+    {
+        var entity = new Submission { SubmissionId = 1, WorkId = 1 };
+        var mockSet = new Mock<DbSet<Submission>>();
+        var mockContext = new Mock<ScribeTraxDbContext>();
+        mockContext.Setup(c => c.Submissions).Returns(mockSet.Object);
+        mockContext.Setup(c => c.Submissions.Find(1)).Returns(entity);
+
+        var service = new SubmissionService(mockContext.Object);
+        service.DeleteSubmission(1);
+
+        mockSet.Verify(m => m.Remove(entity), Times.Once);
+        mockContext.Verify(m => m.SaveChanges(), Times.Once);
+    }
+}
