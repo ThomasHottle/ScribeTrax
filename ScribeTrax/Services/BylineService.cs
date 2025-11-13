@@ -18,9 +18,9 @@
 // Fix for CS0266 and CS8629: Explicitly handle nullable bool conversion and possible null value
 public IEnumerable<BylineViewModel> GetAllBylines(bool includeInactive = false)
 {
-    var query = _context.Bylines.AsQueryable();
+        var query = includeInactive ? _context.Bylines : _context.Bylines.ActiveOnly();
 
-    if (!includeInactive)
+            if (!includeInactive)
         query = query.Where(b => b.Inactive == false || b.Inactive == null);
 
     return query

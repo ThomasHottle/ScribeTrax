@@ -15,24 +15,32 @@ public class BylineServiceTests
     {
         new Byline { BylineId = 1, Name = "Tommy Bolin", Type = "Solo", Inactive = false },
         new Byline { BylineId = 2, Name = "Energy", Type = "Band", Inactive = true },
-        new Byline { BylineId = 3, Name = "Billy Cobham", Type = "Collab", Inactive = null }
+        new Byline { BylineId = 4, Name = "Billy Cobham", Type = "Collab", Inactive = null }
     };
 
     private Mock<DbSet<Byline>> GetMockSet(List<Byline> data)
     {
         var queryable = data.AsQueryable();
+
         var mockSet = new Mock<DbSet<Byline>>();
         mockSet.As<IQueryable<Byline>>().Setup(m => m.Provider).Returns(queryable.Provider);
         mockSet.As<IQueryable<Byline>>().Setup(m => m.Expression).Returns(queryable.Expression);
         mockSet.As<IQueryable<Byline>>().Setup(m => m.ElementType).Returns(queryable.ElementType);
-        mockSet.As<IQueryable<Byline>>().Setup(m => m.GetEnumerator()).Returns(queryable.GetEnumerator());
+        mockSet.As<IQueryable<Byline>>().Setup(m => m.GetEnumerator()).Returns(() => queryable.GetEnumerator());
+
         return mockSet;
     }
 
     [Fact]
     public void GetAllBylines_ExcludesInactive_WhenFlagFalse()
     {
-        var data = GetFakeBylines();
+        var data = new List<Byline>
+    {
+        new Byline { BylineId = 1, Name = "Tommy Bolin", Type = "Solo", Inactive = false },
+        new Byline { BylineId = 2, Name = "Energy", Type = "Band", Inactive = true },
+        new Byline { BylineId = 4, Name = "Billy Cobham", Type = "Collab", Inactive = null }
+    };
+
         var mockSet = GetMockSet(data);
         var mockContext = new Mock<ScribeTraxDbContext>();
         mockContext.Setup(c => c.Bylines).Returns(mockSet.Object);
@@ -41,7 +49,7 @@ public class BylineServiceTests
         var result = service.GetAllBylines(includeInactive: false);
 
         result.Should().HaveCount(2);
-        result.Should().NotContain(b => b.Name == "Energy");
+        result.Should().OnlyContain(b => b.IsInactive == false || b.IsInactive == null);
     }
 
     [Fact]

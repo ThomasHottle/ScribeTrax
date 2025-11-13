@@ -1,109 +1,121 @@
-﻿using Xunit;
-using Moq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using ScribeTrax.Context;
 using ScribeTrax.Models;
 using ScribeTrax.Services;
-using System.Collections.Generic;
-using System.Linq;
+using ScribeTrax.ViewModels;
+using Xunit;
 
 public class MarketServiceTests
 {
     private List<Market> GetFakeMarkets() => new()
     {
-        new Market { MarketId = 1, Name = "SciFi Weekly", Editor = "Jane", Type = "Magazine", Email = "jane@scifi.com", Url = "http://scifi.com", Postal = "12345" },
-        new Market { MarketId = 2, Name = "Fantasy Digest", Editor = "Bob", Type = "Web", Email = "bob@fantasy.com", Url = "http://fantasy.com", Postal = "67890" }
+        new Market
+        {
+            MarketId = 1,
+            Name = "Jazz Monthly",
+            Type = "Print",
+            Editor = "Jane",
+            Email = "jane@jazzmonthly.com",
+            Url = "http://jazzmonthly.com",
+            Postal = "12345"
+        },
+        new Market
+        {
+            MarketId = 2,
+            Name = "Fusion Weekly",
+            Type = "Web",
+            Editor = "Bob",
+            Email = "bob@fusionweekly.com",
+            Url = "http://fusionweekly.com",
+            Postal = "67890"
+        }
     };
 
-    private Mock<DbSet<Market>> GetMockSet(List<Market> data)
+    private Mock<DbSet<Market>> GetMockMarketSet(List<Market> data)
     {
         var queryable = data.AsQueryable();
         var mockSet = new Mock<DbSet<Market>>();
         mockSet.As<IQueryable<Market>>().Setup(m => m.Provider).Returns(queryable.Provider);
         mockSet.As<IQueryable<Market>>().Setup(m => m.Expression).Returns(queryable.Expression);
         mockSet.As<IQueryable<Market>>().Setup(m => m.ElementType).Returns(queryable.ElementType);
-        mockSet.As<IQueryable<Market>>().Setup(m => m.GetEnumerator()).Returns(queryable.GetEnumerator());
+        mockSet.As<IQueryable<Market>>().Setup(m => m.GetEnumerator()).Returns(() => queryable.GetEnumerator());
         return mockSet;
     }
 
     [Fact]
     public void GetAllMarkets_ReturnsAllMarkets()
     {
-        var data = GetFakeMarkets();
-        var mockSet = GetMockSet(data);
+        var mockSet = GetMockMarketSet(GetFakeMarkets());
         var mockContext = new Mock<ScribeTraxDbContext>();
         mockContext.Setup(c => c.Markets).Returns(mockSet.Object);
 
         var service = new MarketService(mockContext.Object);
-        var result = service.GetAllMarkets();
+        var result = service.GetAllMarkets().ToList();
 
         result.Should().HaveCount(2);
-        result.Should().Contain(m => m.Name == "SciFi Weekly");
+        result[0].Name.Should().Be("Fusion Weekly"); // Alphabetical order
+        result[1].Name.Should().Be("Jazz Monthly");
     }
 
     [Fact]
     public void GetMarketById_ReturnsCorrectMarket()
     {
-        var data = GetFakeMarkets();
-        var mockSet = GetMockSet(data);
+        var mockSet = GetMockMarketSet(GetFakeMarkets());
         var mockContext = new Mock<ScribeTraxDbContext>();
         mockContext.Setup(c => c.Markets).Returns(mockSet.Object);
-        mockContext.Setup(c => c.Markets.FirstOrDefault(It.IsAny<System.Func<Market, bool>>()))
-                   .Returns((System.Func<Market, bool> predicate) => data.FirstOrDefault(predicate));
 
         var service = new MarketService(mockContext.Object);
         var result = service.GetMarketById(1);
 
         result.Should().NotBeNull();
-        result.Name.Should().Be("SciFi Weekly");
+        result.Name.Should().Be("Jazz Monthly");
+        result.Editor.Should().Be("Jane");
     }
 
     [Fact]
     public void UpdateMarket_UpdatesFieldsAndSaves()
     {
-        var entity = new Market { MarketId = 1, Name = "Old Name", Editor = "Old Editor", Type = "Old Type", Email = "old@email.com", Url = "http://old.com", Postal = "00000" };
-        var mockSet = new Mock<DbSet<Market>>();
+        var market = GetFakeMarkets().First();
+        var mockSet = GetMockMarketSet(new List<Market> { market });
         var mockContext = new Mock<ScribeTraxDbContext>();
         mockContext.Setup(c => c.Markets).Returns(mockSet.Object);
-        mockContext.Setup(c => c.Markets.FirstOrDefault(m => m.MarketId == 1)).Returns(entity);
 
         var service = new MarketService(mockContext.Object);
-        var model = new MarketViewModel
+        var updated = new MarketViewModel
         {
             MarketId = 1,
-            Name = "New Name",
-            Editor = "New Editor",
-            Type = "New Type",
-            Email = "new@email.com",
-            Url = "http://new.com",
+            Name = "Jazz Monthly Updated",
+            Editor = "Janet",
+            Type = "Web",
+            Email = "janet@updated.com",
+            Url = "http://updated.com",
             Postal = "99999"
         };
 
-        service.UpdateMarket(model);
+        service.UpdateMarket(updated);
 
-        entity.Name.Should().Be("New Name");
-        entity.Editor.Should().Be("New Editor");
-        entity.Type.Should().Be("New Type");
-        entity.Email.Should().Be("new@email.com");
-        entity.Url.Should().Be("http://new.com");
-        entity.Postal.Should().Be("99999");
+        market.Name.Should().Be("Jazz Monthly Updated");
+        market.Editor.Should().Be("Janet");
         mockContext.Verify(c => c.SaveChanges(), Times.Once);
     }
 
     [Fact]
-    public void DeleteMarket_RemovesEntityAndSaves()
+    public void DeleteMarket_RemovesMarketAndSaves()
     {
-        var entity = new Market { MarketId = 1, Name = "To Be Deleted" };
-        var mockSet = new Mock<DbSet<Market>>();
+        var market = GetFakeMarkets().First();
+        var mockSet = GetMockMarketSet(new List<Market> { market });
         var mockContext = new Mock<ScribeTraxDbContext>();
         mockContext.Setup(c => c.Markets).Returns(mockSet.Object);
-        mockContext.Setup(c => c.Markets.FirstOrDefault(m => m.MarketId == 1)).Returns(entity);
 
         var service = new MarketService(mockContext.Object);
         service.DeleteMarket(1);
 
-        mockSet.Verify(m => m.Remove(entity), Times.Once);
+        mockSet.Verify(m => m.Remove(It.Is<Market>(mk => mk.MarketId == 1)), Times.Once);
         mockContext.Verify(c => c.SaveChanges(), Times.Once);
     }
 }

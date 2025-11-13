@@ -7,7 +7,7 @@ public partial class Byline
 {
     public int BylineId { get; set; }
 
-    public string Name { get; set; } = null!;
+    public string Name { get; set; }
 
     public string? Type { get; set; }
 
