@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using ScribeTrax.Interfaces;
 using ScribeTrax.ViewModels;
+using ScribeTrax.Services;
 
 namespace ScribeTrax.Controllers
 {
@@ -28,57 +30,108 @@ namespace ScribeTrax.Controllers
             return View(byline);
         }
 
-        // GET: /Byline/Create
+        // GET: Byline/Create
         public IActionResult Create()
         {
-            return View();
+            var model = new BylineCreateModel
+            {
+                TypeOptions = GetTypeOptions()
+            };
+            return View(model);
         }
 
-        // POST: /Byline/Create
+        // POST: Byline/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(BylineCreateModel model)
         {
-            if (!ModelState.IsValid) return View(model);
+            if (!ModelState.IsValid)
+            {
+                model.TypeOptions = GetTypeOptions(); // Rehydrate dropdown
+                return View(model);
+            }
 
-            _bylineService.CreateByline(model);
-            return RedirectToAction(nameof(Index));
+            // ✅ Service should return the new ID
+            int newId = _bylineService.CreateByline(model);
+
+            // Redirect to Details so you can immediately see the new record
+            return RedirectToAction("Details", new { id = newId });
         }
 
-        // GET: /Byline/Edit/5
+
+        // GET: Byline/Edit/5
         public IActionResult Edit(int id)
         {
-            var byline = _bylineService.GetBylineById(id);
-            if (byline == null) return NotFound();
-
-            var updateModel = new BylineUpdateModel
+            var entity = _bylineService.GetBylineById(id);
+            if (entity == null)
             {
-                Name = byline.Name,
-                Type = byline.Type,
-                IsInactive = byline.IsInactive
+                return NotFound();
+            }
+
+            var model = new BylineUpdateModel
+            {
+                BylineId = entity.BylineId,
+                Name = entity.Name,
+                Type = entity.Type,
+                IsInactive = entity.IsInactive,
+                TypeOptions = GetTypeOptions() // ✅ hydrate dropdown
             };
 
-            return View(updateModel);
+            return View(model);
         }
 
-        // POST: /Byline/Edit/5
+        // POST: Byline/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, BylineUpdateModel model)
+        public IActionResult Edit(BylineUpdateModel model)
         {
-            if (!ModelState.IsValid) return View(model);
+            if (!ModelState.IsValid)
+            {
+                model.TypeOptions = GetTypeOptions(); // ✅ rehydrate if validation fails
+                return View(model);
+            }
 
-            _bylineService.UpdateByline(id, model);
+            _bylineService.UpdateByline(model);
+            return RedirectToAction("Details", new { id = model.BylineId });
+        }
+
+        // Helper method
+        private List<SelectListItem> GetTypeOptions() => new()
+        {
+            new SelectListItem { Value = "Author", Text = "Author" },
+            new SelectListItem { Value = "Co-Author", Text = "Co-Author" },
+            new SelectListItem { Value = "Ghost", Text = "Ghost" }
+        };
+
+        // GET: Byline/Delete/5
+        public IActionResult Delete(int id)
+        {
+            var entity = _bylineService.GetBylineById(id);
+            if (entity == null)
+            {
+                return NotFound();
+            }
+
+            // You can pass a simple view model here for confirmation
+            var model = new BylineUpdateModel
+            {
+                BylineId = entity.BylineId,
+                Name = entity.Name,
+                Type = entity.Type,
+                IsInactive = entity.IsInactive
+            };
+
+            return View(model);
+        }
+
+        // POST: Byline/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteConfirmed(int id)
+        {
+            _bylineService.DeleteByline(id);
             return RedirectToAction(nameof(Index));
         }
 
-        // POST: /Byline/Deactivate/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Deactivate(int id)
-        {
-            _bylineService.DeactivateByline(id);
-            return RedirectToAction(nameof(Index));
-        }
     }
 }

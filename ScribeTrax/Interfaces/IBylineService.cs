@@ -17,16 +17,16 @@ namespace ScribeTrax.Interfaces
         /// <summary>
         /// Creates a new byline.
         /// </summary>
-        void CreateByline(BylineCreateModel model);
+        int CreateByline(BylineCreateModel model);
 
         /// <summary>
         /// Updates an existing byline.
         /// </summary>
-        void UpdateByline(int id, BylineUpdateModel model);
+        void UpdateByline(BylineUpdateModel model);
 
         /// <summary>
         /// Marks a byline as inactive.
         /// </summary>
-        void DeactivateByline(int id);
+        void DeleteByline(int id);
     }
 }

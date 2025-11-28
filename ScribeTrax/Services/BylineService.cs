@@ -49,7 +49,7 @@ public BylineViewModel GetBylineById(int id)
     };
 }
 
-        public void CreateByline(BylineCreateModel model)
+        public int CreateByline(BylineCreateModel model)
         {
             var entity = new Byline
             {
@@ -59,11 +59,18 @@ public BylineViewModel GetBylineById(int id)
             };
 
             _context.Bylines.Add(entity);
+
+            // ✅ Without this, nothing is written to SQL
             _context.SaveChanges();
+
+            return entity.BylineId;
         }
 
-        public void UpdateByline(int id, BylineUpdateModel model)
+
+
+        public void UpdateByline(BylineUpdateModel model)
         {
+            int id = model.BylineId;
             var entity = _context.Bylines.Find(id);
             if (entity == null) return;
 
@@ -79,12 +86,15 @@ public BylineViewModel GetBylineById(int id)
             _context.SaveChanges();
         }
 
-        public void DeactivateByline(int id)
+        public void DeleteByline(int id)
         {
             var entity = _context.Bylines.Find(id);
-            if (entity == null) return;
+            if (entity == null)
+            {
+                throw new InvalidOperationException($"Byline with ID {id} not found.");
+            }
 
-            entity.Inactive = true;
+            _context.Bylines.Remove(entity);
             _context.SaveChanges();
         }
     }

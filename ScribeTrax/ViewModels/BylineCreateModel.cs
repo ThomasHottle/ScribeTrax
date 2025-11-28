@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System.ComponentModel.DataAnnotations;
 
 namespace ScribeTrax.ViewModels
 {
@@ -12,6 +14,11 @@ namespace ScribeTrax.ViewModels
         [RegularExpression("Author|Co-Author|Ghost", ErrorMessage = "Type must be Author, Co-Author, or Ghost.")]
         public string Type { get; set; }
 
-        public bool IsInactive { get; set; } = false;
+        public bool? IsInactive { get; set; }
+        
+        [ValidateNever]
+        public IEnumerable<SelectListItem> TypeOptions { get; set; }
+
+
     }
 }

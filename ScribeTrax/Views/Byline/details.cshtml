@@ -1,0 +1,52 @@
+﻿@model ScribeTrax.ViewModels.BylineViewModel
+
+<h2>Byline Details</h2>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <h4 class="card-title">@Model.Name</h4>
+    </div>
+</div>
+
+<h3>Works</h3>
+@if (Model.Works != null && Model.Works.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Genre</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var work in Model.Works)
+            {
+                <tr>
+                    <td>@work.Title</td>
+                    <td>@work.GenreName</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No works found for this byline.</p>
+}
+
+<h3>Related Actions</h3>
+<ul>
+    <li>
+        <a asp-controller="Submission" asp-action="Index" asp-route-bylineId="@Model.BylineId">
+            View Submissions for @Model.Name
+        </a>
+    </li>
+    <li>
+        <a asp-controller="Payment" asp-action="Index" asp-route-bylineId="@Model.BylineId">
+            View Payments for @Model.Name
+        </a>
+    </li>
+</ul>
+
+<a asp-action="Edit" asp-route-id="@Model.BylineId" class="btn btn-primary">Edit</a>
+<a asp-action="Index" class="btn btn-secondary">Back to List</a>

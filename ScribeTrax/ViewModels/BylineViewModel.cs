@@ -16,5 +16,7 @@ namespace ScribeTrax.ViewModels
 
         [Display(Name = "Inactive")]
         public bool IsInactive { get; set; }
+        // ✅ Navigation property for Details view
+        public List<WorkViewModel>? Works { get; set; }
     }
 }
