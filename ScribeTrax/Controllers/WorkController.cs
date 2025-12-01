@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using ScribeTrax.Interfaces;
 using ScribeTrax.Models;
 using ScribeTrax.ViewModels;
+using ScribeTrax.Services;
 
 namespace ScribeTrax.Controllers
 {
@@ -32,6 +35,12 @@ namespace ScribeTrax.Controllers
         // GET: /Work/Create
         public IActionResult Create()
         {
+            var bylines = _workService.GetAllBylines();
+            var genres = _workService.GetAllGenres();
+
+            ViewBag.Bylines = new SelectList(bylines, "BylineId", "Name");
+            ViewBag.Genres = new SelectList(genres, "GenreId", "Name");
+
             return View();
         }
 
@@ -60,41 +69,52 @@ namespace ScribeTrax.Controllers
             var work = _workService.GetWorkById(id);
             if (work == null) return NotFound();
 
-            var updateModel = new WorkUpdateModel
-            {
-                Title = work.Title,
-                Type = work.Type,
-                BylineId = work.BylineId,
-                GenreId = work.GenreId
-            };
+            // hydrate dropdowns
+            ViewBag.Bylines = new SelectList(_workService.GetAllBylines(), "BylineId", "Name", work.BylineId);
+            ViewBag.Genres = new SelectList(_workService.GetAllGenres(), "GenreId", "Name", work.GenreId);
 
-            return View(updateModel);
+            return View(work); // pass WorkViewModel directly
         }
 
         // POST: /Work/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, WorkUpdateModel model)
+        public IActionResult Edit(WorkUpdateModel model)
         {
-            if (!ModelState.IsValid) return View(model);
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Bylines = new SelectList(_workService.GetAllBylines(), "BylineId", "Name", model.BylineId);
+                ViewBag.Genres = new SelectList(_workService.GetAllGenres(), "GenreId", "Name", model.GenreId);
+                return View(model);
+            }
 
             var entity = new Work
             {
-                WorkId = id,
+                WorkId = model.WorkId,
                 Title = model.Title,
                 Type = model.Type,
-                BylineId = (int)model.BylineId,
+                BylineId = model.BylineId,
                 GenreId = model.GenreId
             };
 
             _workService.UpdateWork(entity);
-            return RedirectToAction(nameof(Index));
+
+            return RedirectToAction("Details", new { id = model.WorkId });
+        }
+
+        // GET: /Work/Delete/5
+        public IActionResult Delete(int id)
+        {
+            var work = _workService.GetWorkById(id);
+            if (work == null) return NotFound();
+
+            return View(work); // pass WorkViewModel to the view
         }
 
         // POST: /Work/Delete/5
-        [HttpPost]
+        [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete(int id)
+        public IActionResult DeleteConfirmed(int id)
         {
             _workService.DeleteWork(id);
             return RedirectToAction(nameof(Index));

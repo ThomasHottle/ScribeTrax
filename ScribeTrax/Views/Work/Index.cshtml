@@ -1,0 +1,47 @@
+﻿@model IEnumerable<ScribeTrax.ViewModels.WorkViewModel>
+
+@{
+    ViewData["Title"] = "Works";
+}
+
+<h2>Works</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create New Work</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(m => m.Title)</th>
+            <th>@Html.DisplayNameFor(m => m.Type)</th>
+            <th>@Html.DisplayNameFor(m => m.BylineName)</th>
+            <th>@Html.DisplayNameFor(m => m.GenreName)</th>
+            <th>@Html.DisplayNameFor(m => m.SubmissionCount)</th>
+            <th>@Html.DisplayNameFor(m => m.HasPayments)</th>
+            <th>@Html.DisplayNameFor(m => m.LastSubmittedDate)</th>
+            <th>@Html.DisplayNameFor(m => m.MostRecentMarketName)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Title</td>
+                <td>@item.Type</td>
+                <td>@item.BylineName</td>
+                <td>@item.GenreName</td>
+                <td>@item.SubmissionCount</td>
+                <td>@(item.HasPayments ? "Yes" : "No")</td>
+                <td>@item.LastSubmittedDate?.ToString("d")</td>
+                <td>@item.MostRecentMarketName</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.WorkId">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.WorkId">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.WorkId">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

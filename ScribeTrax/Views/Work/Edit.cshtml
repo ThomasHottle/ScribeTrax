@@ -1,0 +1,46 @@
+﻿@model ScribeTrax.ViewModels.WorkViewModel
+
+@{
+    ViewData["Title"] = "Edit Work";
+}
+
+<h2>Edit Work</h2>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="WorkId" />
+
+    <div class="form-group">
+        <label asp-for="Title" class="control-label"></label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Type" class="control-label"></label>
+        <input asp-for="Type" class="form-control" />
+        <span asp-validation-for="Type" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="BylineId" class="control-label"></label>
+        <select asp-for="BylineId" class="form-control" asp-items="ViewBag.Bylines"></select>
+        <span asp-validation-for="BylineId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="GenreId" class="control-label"></label>
+        <select asp-for="GenreId" class="form-control" asp-items="ViewBag.Genres"></select>
+        <span asp-validation-for="GenreId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mt-3">
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

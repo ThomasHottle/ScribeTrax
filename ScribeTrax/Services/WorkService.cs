@@ -2,6 +2,7 @@
 using ScribeTrax.Context;
 using ScribeTrax.Interfaces;
 using ScribeTrax.Models;
+using ScribeTrax.ViewModels;
 
 namespace ScribeTrax.Services
 {
@@ -82,6 +83,23 @@ namespace ScribeTrax.Services
                 .ToList();
         }
 
+        public IEnumerable<Byline> GetAllBylines()
+        {
+            return _context.Bylines
+                .Where(b => !b.Inactive.HasValue || !b.Inactive.Value)
+                .OrderBy(b => b.Name)
+                .ToList();
+        }
+
+        public IEnumerable<Genre> GetAllGenres()
+        {
+            return _context.Genres
+                .OrderBy(g => g.Name)
+                .ToList();
+        }
+
+
+
         public void CreateWork(Work work)
         {
             _context.Works.Add(work);
@@ -90,7 +108,14 @@ namespace ScribeTrax.Services
 
         public void UpdateWork(Work work)
         {
-            _context.Works.Update(work);
+            var existing = _context.Works.Find(work.WorkId);
+            if (existing == null) return;
+
+            existing.Title = work.Title;
+            existing.Type = work.Type;
+            existing.BylineId = work.BylineId;
+            existing.GenreId = work.GenreId;
+
             _context.SaveChanges();
         }
 

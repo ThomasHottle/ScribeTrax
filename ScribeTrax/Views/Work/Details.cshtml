@@ -1,0 +1,41 @@
+﻿@model ScribeTrax.ViewModels.WorkViewModel
+
+@{
+    ViewData["Title"] = "Work Details";
+}
+
+<h2>Work Details</h2>
+<hr />
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-2">@Html.DisplayNameFor(m => m.Title)</dt>
+        <dd class="col-sm-10">@Model.Title</dd>
+
+        <dt class="col-sm-2">@Html.DisplayNameFor(m => m.Type)</dt>
+        <dd class="col-sm-10">@Model.Type</dd>
+
+        <dt class="col-sm-2">@Html.DisplayNameFor(m => m.BylineName)</dt>
+        <dd class="col-sm-10">@Model.BylineName</dd>
+
+        <dt class="col-sm-2">@Html.DisplayNameFor(m => m.GenreName)</dt>
+        <dd class="col-sm-10">@Model.GenreName</dd>
+
+        <dt class="col-sm-2">@Html.DisplayNameFor(m => m.SubmissionCount)</dt>
+        <dd class="col-sm-10">@Model.SubmissionCount</dd>
+
+        <dt class="col-sm-2">@Html.DisplayNameFor(m => m.HasPayments)</dt>
+        <dd class="col-sm-10">@(Model.HasPayments ? "Yes" : "No")</dd>
+
+        <dt class="col-sm-2">@Html.DisplayNameFor(m => m.LastSubmittedDate)</dt>
+        <dd class="col-sm-10">@Model.LastSubmittedDate?.ToString("d")</dd>
+
+        <dt class="col-sm-2">@Html.DisplayNameFor(m => m.MostRecentMarketName)</dt>
+        <dd class="col-sm-10">@Model.MostRecentMarketName</dd>
+    </dl>
+</div>
+
+<div class="mt-3">
+    <a asp-action="Edit" asp-route-id="@Model.WorkId" class="btn btn-primary">Edit</a>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+</div>

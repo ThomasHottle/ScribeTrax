@@ -1,4 +1,5 @@
 ﻿using ScribeTrax.Models;
+using ScribeTrax.ViewModels;
 
 namespace ScribeTrax.Interfaces
 {
@@ -7,6 +8,9 @@ namespace ScribeTrax.Interfaces
             WorkViewModel GetWorkById(int id);
 
             IEnumerable<WorkViewModel> GetAllWorks();
+
+            IEnumerable<Byline> GetAllBylines();
+            IEnumerable<Genre> GetAllGenres();
 
             // Optional: Add methods for creation, update, or deletion
             void CreateWork(Work work);
