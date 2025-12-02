@@ -32,6 +32,23 @@ namespace ScribeTrax.Controllers
             return View(market);
         }
 
+        // GET: /Market/Create
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        // POST: /Market/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Create(MarketViewModel model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            _marketService.CreateMarket(model);
+            return RedirectToAction(nameof(Index));
+        }
+
         // GET: /Market/Edit/5
         public IActionResult Edit(int id)
         {

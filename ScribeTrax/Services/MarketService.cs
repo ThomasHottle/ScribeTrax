@@ -46,6 +46,24 @@ namespace ScribeTrax.Services
                 .ToList();
         }
 
+        public void CreateMarket(MarketViewModel model)
+        {
+            var entity = new Market
+            {
+                Name = model.Name,
+                Editor = model.Editor,
+                Type = model.Type,
+                Email = model.Email,
+                Url = model.Url,
+                Postal = model.Postal
+            };
+
+            _context.Markets.Add(entity);
+            _context.SaveChanges();
+        }
+
+
+
         public void UpdateMarket(MarketViewModel model)
         {
             var entity = _context.Markets.FirstOrDefault(m => m.MarketId == model.MarketId);

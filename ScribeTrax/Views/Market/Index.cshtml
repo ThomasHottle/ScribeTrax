@@ -1,0 +1,43 @@
+﻿@model IEnumerable<ScribeTrax.Models.MarketViewModel>
+
+@{
+    ViewData["Title"] = "Markets";
+}
+
+<h2>Markets</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create New Market</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(m => m.First().Name)</th>
+            <th>@Html.DisplayNameFor(m => m.First().Editor)</th>
+            <th>@Html.DisplayNameFor(m => m.First().Type)</th>
+            <th>@Html.DisplayNameFor(m => m.First().Email)</th>
+            <th>@Html.DisplayNameFor(m => m.First().Url)</th>
+            <th>@Html.DisplayNameFor(m => m.First().Postal)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Name</td>
+                <td>@item.Editor</td>
+                <td>@item.Type</td>
+                <td>@item.Email</td>
+                <td>@item.Url</td>
+                <td>@item.Postal</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.MarketId" class="btn btn-info btn-sm">Details</a>
+                    <a asp-action="Edit" asp-route-id="@item.MarketId" class="btn btn-warning btn-sm">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@item.MarketId" class="btn btn-danger btn-sm">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
