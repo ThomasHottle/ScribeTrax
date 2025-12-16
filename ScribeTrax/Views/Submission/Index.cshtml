@@ -1,0 +1,35 @@
+﻿@model IEnumerable<ScribeTrax.ViewModels.SubmissionViewModel>
+
+<h2>Submissions</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Work</th>
+            <th>Byline</th>
+            <th>Market</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Fee</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.WorkTitle</td>
+                <td>@item.BylineName</td>
+                <td>@item.MarketName</td>
+                <td>@item.SubmissionDate?.ToShortDateString()</td>
+                <td>@item.Status</td>
+                <td>@item.Fee</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.SubmissionId">Details</a> |
+                    <a asp-action="Edit" asp-route-id="@item.SubmissionId">Edit</a> |
+                    <a asp-action="Delete" asp-route-id="@item.SubmissionId">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

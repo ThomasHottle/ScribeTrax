@@ -1,7 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ScribeTrax.Context;
 using ScribeTrax.Models;
-using ScribeTrax.Interfaces;
+using ScribeTrax.Services;
+using System.Collections.Generic;
+using System.Linq;
+using ScribeTrax.ViewModels;
 
 namespace ScribeTrax.Services
 {
@@ -14,109 +17,149 @@ namespace ScribeTrax.Services
             _context = context;
         }
 
-        public SubmissionViewModel GetSubmissionById(int id)
-        {
-            var submission = _context.Submissions
-                .Include(s => s.Work)
-                    .ThenInclude(w => w.Byline)
-                .Include(s => s.Work)
-                    .ThenInclude(w => w.Genre)
-                .Include(s => s.Market)
-                .FirstOrDefault(s => s.SubmissionId == id);
-
-            if (submission == null) return null;
-
-            return new SubmissionViewModel
-            {
-                SubmissionId = submission.SubmissionId,
-                WorkId = submission.WorkId,
-                WorkTitle = submission.Work?.Title,
-                GenreName = submission.Work?.Genre?.Name,
-                BylineName = submission.Work?.Byline?.Name,
-                MarketId = submission.MarketId,
-                MarketName = submission.Market?.Name,
-                MarketType = submission.Market?.Type,
-                EditorName = submission.Market?.Editor,
-                SubmissionDate = submission.SubmissionDate,
-                IsAccepted = false, // Placeholder if you add status later
-                IsPaid = _context.Payments.Any(p => p.WorkId == submission.WorkId)
-            };
-        }
-
-        public IEnumerable<SubmissionViewModel> GetSubmissionsByWorkId(int workId)
-        {
-            return _context.Submissions
-                .Include(s => s.Work)
-                    .ThenInclude(w => w.Byline)
-                .Include(s => s.Work)
-                    .ThenInclude(w => w.Genre)
-                .Include(s => s.Market)
-                .Where(s => s.WorkId == workId)
-                .OrderByDescending(s => s.SubmissionDate)
-                .Select(s => new SubmissionViewModel
-                {
-                    SubmissionId = s.SubmissionId,
-                    WorkId = s.WorkId,
-                    WorkTitle = s.Work.Title,
-                    GenreName = s.Work.Genre.Name,
-                    BylineName = s.Work.Byline.Name,
-                    MarketId = s.MarketId,
-                    MarketName = s.Market.Name,
-                    MarketType = s.Market.Type,
-                    EditorName = s.Market.Editor,
-                    SubmissionDate = s.SubmissionDate,
-                    IsAccepted = false,
-                    IsPaid = _context.Payments.Any(p => p.WorkId == s.WorkId)
-                })
-                .ToList();
-        }
-
         public IEnumerable<SubmissionViewModel> GetAllSubmissions()
         {
             return _context.Submissions
                 .Include(s => s.Work)
-                    .ThenInclude(w => w.Byline)
-                .Include(s => s.Work)
-                    .ThenInclude(w => w.Genre)
                 .Include(s => s.Market)
+                .Include(s => s.Byline)
                 .OrderByDescending(s => s.SubmissionDate)
                 .Select(s => new SubmissionViewModel
                 {
                     SubmissionId = s.SubmissionId,
-                    WorkId = s.WorkId,
-                    WorkTitle = s.Work.Title,
-                    GenreName = s.Work.Genre.Name,
-                    BylineName = s.Work.Byline.Name,
-                    MarketId = s.MarketId,
-                    MarketName = s.Market.Name,
-                    MarketType = s.Market.Type,
-                    EditorName = s.Market.Editor,
+                    WorkId = s.WorkId ?? 0,
+                    BylineId = s.BylineId,
+                    MarketId = s.MarketId ?? 0,
                     SubmissionDate = s.SubmissionDate,
-                    IsAccepted = false,
-                    IsPaid = _context.Payments.Any(p => p.WorkId == s.WorkId)
+                    Status = s.Status,
+                    Fee = s.Fee,
+                    SelfPublished = s.SelfPublished,
+                    Royalty = s.Royalty,
+
+                    // Names for display
+                    WorkTitle = s.Work != null ? s.Work.Title : string.Empty,
+                    BylineName = s.Byline != null ? s.Byline.Name : string.Empty,
+                    MarketName = s.Market != null ? s.Market.Name : string.Empty
                 })
                 .ToList();
         }
-        public void CreateSubmission(Submission submission)
+        public SubmissionViewModel GetSubmissionById(int id)
         {
-            _context.Submissions.Add(submission);
+            var s = _context.Submissions
+                .Include(x => x.Work)
+                .Include(x => x.Market)
+                .Include(x => x.Byline)
+                .Include(x => x.PaymentType)
+                .FirstOrDefault(x => x.SubmissionId == id);
+
+            if (s == null) return null;
+
+            return new SubmissionViewModel
+            {
+                SubmissionId = s.SubmissionId,
+                WorkId = s.WorkId ?? 0,
+                MarketId = s.MarketId ?? 0,
+                BylineId = s.BylineId,
+                SubmissionDate = s.SubmissionDate,
+                Status = s.Status,
+                Fee = s.Fee,
+                SelfPublished = s.SelfPublished,
+                Royalty = s.Royalty
+            };
+        }
+        // Existing methods (GetSubmissionById, GetAllSubmissions, etc.) …
+
+        public void CreateSubmission(SubmissionViewModel model)
+        {
+            var entity = new Submission
+            {
+                WorkId = model.WorkId,
+                MarketId = model.MarketId,
+                BylineId = model.BylineId,
+                SubmissionDate = model.SubmissionDate,
+                Status = model.Status,
+                PaymentTypeId = model.PaymentTypeId,
+                Fee = model.Fee,
+                SelfPublished = model.SelfPublished,
+                Royalty = model.Royalty
+            };
+
+            _context.Submissions.Add(entity);
             _context.SaveChanges();
         }
 
-        public void UpdateSubmission(Submission submission)
+        public void UpdateSubmission(SubmissionViewModel model)
         {
-            _context.Submissions.Update(submission);
+            var entity = _context.Submissions.FirstOrDefault(s => s.SubmissionId == model.SubmissionId);
+            if (entity == null) return;
+
+            entity.WorkId = model.WorkId;
+            entity.MarketId = model.MarketId;
+            entity.BylineId = model.BylineId;
+            entity.SubmissionDate = model.SubmissionDate;
+            entity.Status = model.Status;
+            entity.Fee = model.Fee;
+            entity.SelfPublished = model.SelfPublished;
+            entity.Royalty = model.Royalty;
+
             _context.SaveChanges();
         }
 
         public void DeleteSubmission(int id)
         {
-            var submission = _context.Submissions.Find(id);
-            if (submission != null)
+            var entity = _context.Submissions.FirstOrDefault(s => s.SubmissionId == id);
+            if (entity == null) return;
+
+            _context.Submissions.Remove(entity);
+            _context.SaveChanges();
+        }
+
+        // ✅ New helper methods
+        public IEnumerable<Work> GetWorks()
+        {
+            return _context.Works
+                .OrderBy(w => w.Title)
+                .ToList();
+        }
+
+        public IEnumerable<SubmissionViewModel> GetSubmissionsByWorkId(int workId)
+        {           
+            return _context.Submissions
+            .Include(s => s.Work)
+            .Include(s => s.Market)
+            .Include(s => s.Byline)
+            .Include(s => s.PaymentType)
+            .Where(s => s.WorkId == workId)
+            .OrderByDescending(s => s.SubmissionDate)
+            .Select(s => new SubmissionViewModel
             {
-                _context.Submissions.Remove(submission);
-                _context.SaveChanges();
-            }
+                SubmissionId = s.SubmissionId,
+                WorkId = s.WorkId ?? 0,
+                MarketId = s.MarketId ?? 0,
+                BylineId = s.BylineId,
+                SubmissionDate = s.SubmissionDate,
+                Status = s.Status,
+                Fee = s.Fee,
+                SelfPublished = s.SelfPublished,
+                Royalty = s.Royalty
+            })
+            .ToList();
+        }
+
+
+
+        public IEnumerable<Market> GetMarkets()
+        {
+            return _context.Markets
+                .OrderBy(m => m.Name)
+                .ToList();
+        }
+
+        public IEnumerable<Byline> GetBylines()
+        {
+            return _context.Bylines
+                .OrderBy(b => b.Name)
+                .ToList();
         }
     }
 }

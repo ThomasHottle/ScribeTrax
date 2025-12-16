@@ -1,12 +1,27 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using ScribeTrax.Context;
 using ScribeTrax.Models;
 using ScribeTrax.Services;
+using ScribeTrax.ViewModels;
 
 namespace ScribeTrax.Controllers
 {
     public class SubmissionController : Controller
     {
+        private readonly ScribeTraxDbContext _context;
         private readonly ISubmissionService _submissionService;
+        private static readonly List<string> SubmissionStatuses = new()
+        {
+            "Pending",
+            "Accepted",
+            "Rejected",
+            "Published",
+            "Open"
+        };
+        public IEnumerable<Work> GetWorks() => _context.Works.ToList();
+        public IEnumerable<Market> GetMarkets() => _context.Markets.ToList();
 
         public SubmissionController(ISubmissionService submissionService)
         {
@@ -23,72 +38,83 @@ namespace ScribeTrax.Controllers
         // GET: /Submission/Details/5
         public IActionResult Details(int id)
         {
+            if (id <= 0) return BadRequest();
+
             var submission = _submissionService.GetSubmissionById(id);
-            if (submission == null)
-            {
-                return NotFound();
-            }
+            if (submission == null) return NotFound();
+
+            // Resolve names for display
+            ViewBag.WorkTitle = _submissionService.GetWorks()
+                .FirstOrDefault(w => w.WorkId == submission.WorkId)?.Title;
+
+            ViewBag.BylineName = _submissionService.GetBylines()
+                .FirstOrDefault(b => b.BylineId == submission.BylineId)?.Name;
+
+            ViewBag.MarketName = _submissionService.GetMarkets()
+                .FirstOrDefault(m => m.MarketId == submission.MarketId)?.Name;
+
             return View(submission);
         }
 
         // GET: /Submission/Create
         public IActionResult Create()
         {
-            return View();
+            ViewBag.Works = new SelectList(_submissionService.GetWorks(), "WorkId", "Title");
+            ViewBag.Markets = new SelectList(_submissionService.GetMarkets(), "MarketId", "Name");
+
+            var model = new SubmissionViewModel
+            {
+                SubmissionDate = DateTime.Now,
+                Status = "Pending"
+            };
+
+            return View(model);
         }
 
         // POST: /Submission/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Submission submission)
+        public IActionResult Create(SubmissionViewModel model)
         {
-            if (!ModelState.IsValid)
-            {
-                return View(submission);
-            }
+            if (model == null || !ModelState.IsValid)
+                return View(model);
 
-            _submissionService.CreateSubmission(submission);
+            _submissionService.CreateSubmission(model);
             return RedirectToAction(nameof(Index));
         }
 
         // GET: /Submission/Edit/5
         public IActionResult Edit(int id)
         {
-            var submission = _submissionService.GetSubmissionById(id);
-            if (submission == null)
-            {
-                return NotFound();
-            }
+            if (id <= 0) return BadRequest();
 
-            // You may want to map ViewModel back to Submission for editing
-            var model = new Submission
-            {
-                SubmissionId = submission.SubmissionId,
-                WorkId = submission.WorkId,
-                MarketId = submission.MarketId,
-                SubmissionDate = submission.SubmissionDate
-                // Add other fields as needed
-            };
+            var submissionVm = _submissionService.GetSubmissionById(id);
+            if (submissionVm == null) return NotFound();
 
-            return View(model);
+            ViewBag.Works = new SelectList(_submissionService.GetWorks(), "WorkId", "Title", submissionVm.WorkId);
+            ViewBag.Markets = new SelectList(_submissionService.GetMarkets(), "MarketId", "Name", submissionVm.MarketId);
+            ViewBag.Statuses = new SelectList(SubmissionStatuses, submissionVm.Status);
+
+            return View(submissionVm);
         }
+
+
 
         // POST: /Submission/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, Submission submission)
+        public IActionResult Edit(SubmissionViewModel model)
         {
-            if (id != submission.SubmissionId)
-            {
-                return BadRequest();
-            }
-
             if (!ModelState.IsValid)
             {
-                return View(submission);
+                ViewBag.Works = new SelectList(_submissionService.GetWorks(), "WorkId", "Title", model.WorkId);
+                ViewBag.Markets = new SelectList(_submissionService.GetMarkets(), "MarketId", "Name", model.MarketId);
+                ViewBag.Statuses = new SelectList(SubmissionStatuses, model.Status);
+
+                return View(model);
             }
 
-            _submissionService.UpdateSubmission(submission);
+            _submissionService.UpdateSubmission(model);
             return RedirectToAction(nameof(Index));
         }
 
@@ -96,10 +122,18 @@ namespace ScribeTrax.Controllers
         public IActionResult Delete(int id)
         {
             var submission = _submissionService.GetSubmissionById(id);
-            if (submission == null)
-            {
-                return NotFound();
-            }
+            if (submission == null) return NotFound();
+
+            // Populate names for display
+            ViewBag.WorkTitle = _submissionService.GetWorks()
+                .FirstOrDefault(w => w.WorkId == submission.WorkId)?.Title;
+
+            ViewBag.BylineName = _submissionService.GetBylines()
+                .FirstOrDefault(b => b.BylineId == submission.BylineId)?.Name;
+
+            ViewBag.MarketName = _submissionService.GetMarkets()
+                .FirstOrDefault(m => m.MarketId == submission.MarketId)?.Name;
+
             return View(submission);
         }
 

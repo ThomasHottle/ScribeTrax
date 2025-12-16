@@ -10,7 +10,7 @@ public partial class Work
 
     public int BylineId { get; set; }
 
-    public string Title { get; set; } = null!;
+    public string Title { get; set; }
 
     public string? Type { get; set; }
 

@@ -7,7 +7,7 @@ public partial class Market
 {
     public int MarketId { get; set; }
 
-    public string Name { get; set; } = null!;
+    public string Name { get; set; }
 
     public string? Editor { get; set; }
 
