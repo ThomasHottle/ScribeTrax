@@ -1,0 +1,46 @@
+﻿@model ScribeTrax.ViewModels.PaymentViewModel
+
+@{
+    ViewData["Title"] = "Delete Payment";
+}
+
+<h1>Delete Payment</h1>
+
+<h3>Are you sure you want to delete this payment?</h3>
+
+<div>
+    <h4>Payment</h4>
+    <hr />
+
+    <dl class="row">
+        <dt class="col-sm-3">Work</dt>
+        <dd class="col-sm-9">@Model.WorkTitle</dd>
+
+        <dt class="col-sm-3">Market</dt>
+        <dd class="col-sm-9">@Model.MarketName</dd>
+
+        <dt class="col-sm-3">Byline</dt>
+        <dd class="col-sm-9">@Model.BylineName</dd>
+
+        <dt class="col-sm-3">Submission Date</dt>
+        <dd class="col-sm-9">@Model.SubmissionDate</dd>
+
+        <dt class="col-sm-3">Amount</dt>
+        <dd class="col-sm-9">@Model.Amount</dd>
+
+        <dt class="col-sm-3">Payment Date</dt>
+        <dd class="col-sm-9">@Model.PaymentDate?.ToShortDateString()</dd>
+
+        <dt class="col-sm-3">Payment Type</dt>
+        <dd class="col-sm-9">@Model.PaymentTypeName</dd>
+    </dl>
+</div>
+
+<form asp-action="Delete">
+    <input type="hidden" asp-for="PaymentId" />
+
+    <div class="form-group">
+        <input type="submit" value="Delete" class="btn btn-danger" />
+        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    </div>
+</form>

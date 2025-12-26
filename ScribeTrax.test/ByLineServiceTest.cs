@@ -108,7 +108,7 @@ public class BylineServiceTests
         var service = new BylineService(mockContext.Object);
         var model = new BylineUpdateModel { Name = "New Name", Type = "New Type", IsInactive = true };
 
-        service.UpdateByline(1, model);
+        service.UpdateByline(model);
 
         entity.Name.Should().Be("New Name");
         entity.Type.Should().Be("New Type");

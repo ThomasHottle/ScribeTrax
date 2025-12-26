@@ -1,0 +1,62 @@
+﻿@model ScribeTrax.ViewModels.PaymentViewModel
+
+@{
+    ViewData["Title"] = "Edit Payment";
+}
+
+<h1>Edit Payment</h1>
+
+<hr />
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="PaymentId" />
+
+    <div class="form-group">
+        <label asp-for="WorkId" class="control-label"></label>
+        <input asp-for="WorkId" class="form-control" />
+        <span asp-validation-for="WorkId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="MarketId" class="control-label"></label>
+        <input asp-for="MarketId" class="form-control" />
+        <span asp-validation-for="MarketId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="SubmissionId" class="control-label"></label>
+        <input asp-for="SubmissionId" class="form-control" />
+        <span asp-validation-for="SubmissionId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Amount" class="control-label"></label>
+        <input asp-for="Amount" class="form-control" />
+        <span asp-validation-for="Amount" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="PaymentDate" class="control-label"></label>
+        <input asp-for="PaymentDate" class="form-control" type="date" />
+        <span asp-validation-for="PaymentDate" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="PaymentTypeId" class="control-label"></label>
+        <input asp-for="PaymentTypeId" class="form-control" />
+        <span asp-validation-for="PaymentTypeId" class="text-danger"></span>
+    </div>
+
+    <br />
+
+    <div class="form-group">
+        <input type="submit" value="Save" class="btn btn-primary" />
+        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

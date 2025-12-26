@@ -17,7 +17,6 @@ builder.Services.AddScoped<IWorkService, WorkService>();
 builder.Services.AddScoped<IMarketService, MarketService>();
 builder.Services.AddScoped<ISubmissionService, SubmissionService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
-
 var app = builder.Build();
 
 
