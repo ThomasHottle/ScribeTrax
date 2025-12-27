@@ -43,9 +43,13 @@
 
     <div class="form-group">
         <label asp-for="PaymentTypeId" class="control-label"></label>
-        <input asp-for="PaymentTypeId" class="form-control" />
+        <select asp-for="PaymentTypeId" class="form-control" asp-items="ViewBag.PaymentTypes">
+            <option value="">-- Select Payment Type --</option>
+        </select>
         <span asp-validation-for="PaymentTypeId" class="text-danger"></span>
     </div>
+
+
 
     <br />
 

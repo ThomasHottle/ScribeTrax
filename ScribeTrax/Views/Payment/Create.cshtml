@@ -11,19 +11,27 @@
 <form asp-action="Create" method="post">
     <div class="form-group">
         <label asp-for="WorkId" class="control-label"></label>
-        <input asp-for="WorkId" class="form-control" />
+        <select asp-for="WorkId" class="form-control" asp-items="ViewBag.Works">
+            <option value="">-- Select Work --</option>
+        </select>
         <span asp-validation-for="WorkId" class="text-danger"></span>
     </div>
 
+
+
     <div class="form-group">
         <label asp-for="MarketId" class="control-label"></label>
-        <input asp-for="MarketId" class="form-control" />
+        <select asp-for="MarketId" class="form-control" asp-items="ViewBag.Markets">
+            <option value="">-- Select Market --</option>
+        </select>
         <span asp-validation-for="MarketId" class="text-danger"></span>
     </div>
 
     <div class="form-group">
         <label asp-for="SubmissionId" class="control-label"></label>
-        <input asp-for="SubmissionId" class="form-control" />
+        <select asp-for="SubmissionId" class="form-control" asp-items="ViewBag.Submissions">
+            <option value="">-- Select Submission --</option>
+        </select>
         <span asp-validation-for="SubmissionId" class="text-danger"></span>
     </div>
 
@@ -41,9 +49,13 @@
 
     <div class="form-group">
         <label asp-for="PaymentTypeId" class="control-label"></label>
-        <input asp-for="PaymentTypeId" class="form-control" />
+        <select asp-for="PaymentTypeId" class="form-control" asp-items="ViewBag.PaymentTypes">
+            <option value="">-- Select Payment Type --</option>
+        </select>
         <span asp-validation-for="PaymentTypeId" class="text-danger"></span>
     </div>
+
+
 
     <br />
 
