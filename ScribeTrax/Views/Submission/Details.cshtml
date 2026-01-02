@@ -1,7 +1,12 @@
 ﻿@model ScribeTrax.ViewModels.SubmissionViewModel
 
 <h2>Submission Details</h2>
-
+<a asp-controller="Payment"
+   asp-action="Create"
+   asp-route-submissionId="@Model.SubmissionId"
+   class="btn btn-primary">
+    Create Payment
+</a>
 <dl class="row">
     <dt class="col-sm-2">Work</dt>
     <dd class="col-sm-10">@ViewBag.WorkTitle</dd>

@@ -33,9 +33,15 @@ namespace ScribeTrax.Controllers
         }
 
         // GET: /Market/Create
-        public IActionResult Create()
+        public IActionResult Create(int? workId)
         {
-            return View();
+            var model = new MarketViewModel
+            {
+                // Preserve the WorkId so we can return to Submission/Create
+                WorkId = workId
+            };
+
+            return View(model);
         }
 
         // POST: /Market/Create
@@ -43,11 +49,18 @@ namespace ScribeTrax.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(MarketViewModel model)
         {
-            if (!ModelState.IsValid) return View(model);
+            if (!ModelState.IsValid)
+                return View(model);
 
-            _marketService.CreateMarket(model);
-            return RedirectToAction(nameof(Index));
+            var newMarketId = _marketService.CreateMarket(model);
+
+            return RedirectToAction(
+                "Create",
+                "Submission",
+                new { workId = model.WorkId, marketId = newMarketId }
+            );
         }
+
 
         // GET: /Market/Edit/5
         public IActionResult Edit(int id)

@@ -100,11 +100,20 @@ namespace ScribeTrax.Services
 
 
 
-        public void CreateWork(Work work)
+        public void CreateWork(WorkCreateModel model)
         {
+            var work = new Work
+            {
+                Title = model.Title,
+                GenreId = model.GenreId,
+                BylineId = model.BylineId.Value,
+            };
+
             _context.Works.Add(work);
             _context.SaveChanges();
         }
+
+
 
         public void UpdateWork(Work work)
         {

@@ -8,7 +8,7 @@ public partial class Work
 
     public int WorkId { get; set; }
 
-    public int BylineId { get; set; }
+    public int? BylineId { get; set; }
 
     public string Title { get; set; }
 

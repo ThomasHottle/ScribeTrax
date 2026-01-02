@@ -6,15 +6,24 @@
 
 <h2>Create Submission</h2>
 
+<a asp-controller="Market"
+   asp-action="Create"
+   asp-route-workId="@Model.WorkId"
+   class="btn btn-secondary">
+    Create New Market
+</a>
+
 <form asp-action="Create" method="post">
+    <!-- Work dropdown -->
     <div class="form-group">
-        <label asp-for="WorkId" class="control-label">Work</label>
+        <label asp-for="WorkId" class="control-label"></label>
         <select asp-for="WorkId" class="form-control" asp-items="ViewBag.Works"></select>
         <span asp-validation-for="WorkId" class="text-danger"></span>
     </div>
 
+    <!-- Market dropdown -->
     <div class="form-group">
-        <label asp-for="MarketId" class="control-label">Market</label>
+        <label asp-for="MarketId" class="control-label"></label>
         <select asp-for="MarketId" class="form-control" asp-items="ViewBag.Markets"></select>
         <span asp-validation-for="MarketId" class="text-danger"></span>
     </div>
@@ -25,9 +34,10 @@
         <span asp-validation-for="SubmissionDate" class="text-danger"></span>
     </div>
 
+    <!-- Status dropdown -->
     <div class="form-group">
         <label asp-for="Status" class="control-label"></label>
-        <input asp-for="Status" class="form-control" />
+        <select asp-for="Status" class="form-control" asp-items="ViewBag.Statuses"></select>
         <span asp-validation-for="Status" class="text-danger"></span>
     </div>
 

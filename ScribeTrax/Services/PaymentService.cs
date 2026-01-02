@@ -76,17 +76,17 @@ namespace ScribeTrax.Services
 
         public void CreatePayment(PaymentViewModel model)
         {
-            var entity = new Payment
+            var payment = new Payment
             {
+                SubmissionId = model.SubmissionId,
                 WorkId = model.WorkId,
                 MarketId = model.MarketId,
-                SubmissionId = model.SubmissionId,
                 Amount = model.Amount,
                 PaymentDate = model.PaymentDate,
                 PaymentTypeId = model.PaymentTypeId
             };
 
-            _context.Payments.Add(entity);
+            _context.Payments.Add(payment);
             _context.SaveChanges();
         }
 

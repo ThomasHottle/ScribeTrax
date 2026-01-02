@@ -5,7 +5,7 @@ namespace ScribeTrax.ViewModels
 {
     public class WorkViewModel
     {
-        public int WorkId { get; set; }
+        public int? WorkId { get; set; }
 
         [Required]
         [StringLength(500)]
@@ -14,7 +14,7 @@ namespace ScribeTrax.ViewModels
         [Display(Name = "Work Type")]
         public string Type { get; set; }
 
-        public int BylineId { get; set; }
+        public int? BylineId { get; set; }
 
         [Display(Name = "Author")]
         public string BylineName { get; set; }

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ScribeTrax.Context;
+using ScribeTrax.Interfaces;
 using ScribeTrax.Models;
 using ScribeTrax.Services;
 using ScribeTrax.ViewModels;
@@ -12,6 +13,8 @@ namespace ScribeTrax.Controllers
     {
         private readonly ScribeTraxDbContext _context;
         private readonly ISubmissionService _submissionService;
+        private readonly IWorkService _workService;
+        private readonly IMarketService _marketService;
         private static readonly List<string> SubmissionStatuses = new()
         {
             "Pending",
@@ -23,11 +26,13 @@ namespace ScribeTrax.Controllers
         public IEnumerable<Work> GetWorks() => _context.Works.ToList();
         public IEnumerable<Market> GetMarkets() => _context.Markets.ToList();
 
-        public SubmissionController(ISubmissionService submissionService)
+        public SubmissionController(ScribeTraxDbContext context, ISubmissionService submissionService, IWorkService workService, IMarketService marketService)
         {
+            _context = context;
             _submissionService = submissionService;
+            _workService = workService;
+            _marketService = marketService;
         }
-
         // GET: /Submission/
         public IActionResult Index()
         {
@@ -57,18 +62,34 @@ namespace ScribeTrax.Controllers
         }
 
         // GET: /Submission/Create
-        public IActionResult Create()
+        public IActionResult Create(SubmissionCreateRequest request)
         {
-            ViewBag.Works = new SelectList(_submissionService.GetWorks(), "WorkId", "Title");
-            ViewBag.Markets = new SelectList(_submissionService.GetMarkets(), "MarketId", "Name");
+            ModelState.Clear();
 
-            var model = new SubmissionViewModel
+            var works = _workService.GetAllWorks().ToList();
+            var markets = _marketService.GetAllMarkets().ToList();
+
+            // Insert blank option at the top
+            works.Insert(0, new WorkViewModel { WorkId = null, Title = "" });
+            markets.Insert(0, new MarketViewModel { MarketId = null, Name = "" });
+            var statuses = new List<string>
+                {
+                    "New",
+                    "Submitted",
+                    "Accepted",
+                    "Rejected",
+                    "Withdrawn"
+                };
+
+            ViewBag.Works = new SelectList(works, "WorkId", "Title", request.WorkId);
+            ViewBag.Markets = new SelectList(markets, "MarketId", "Name", request.MarketId);
+            ViewBag.Statuses = new SelectList(statuses);
+
+            return View(new SubmissionViewModel
             {
-                SubmissionDate = DateTime.Now,
-                Status = "Pending"
-            };
-
-            return View(model);
+                WorkId = request.WorkId,
+                MarketId = request.MarketId
+            });
         }
 
         // POST: /Submission/Create
@@ -76,10 +97,30 @@ namespace ScribeTrax.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(SubmissionViewModel model)
         {
-            if (model == null || !ModelState.IsValid)
-                return View(model);
+            if (!ModelState.IsValid)
+            {
+                // Only repopulate dropdowns if validation fails
+                var works = _workService.GetAllWorks();
+                var markets = _marketService.GetAllMarkets();
+                var statuses = new List<string>
+                {
+                    "New",
+                    "Submitted",
+                    "Accepted",
+                    "Rejected",
+                    "Withdrawn"
+                };
 
+                ViewBag.Works = new SelectList(works, "WorkId", "Title", model.WorkId);
+                ViewBag.Markets = new SelectList(markets, "MarketId", "Name", model.MarketId);
+                ViewBag.Statuses = new SelectList(statuses);
+
+                return View(model);
+            }
+
+            // On success, no need to repopulate anything
             _submissionService.CreateSubmission(model);
+
             return RedirectToAction(nameof(Index));
         }
 
@@ -97,8 +138,6 @@ namespace ScribeTrax.Controllers
 
             return View(submissionVm);
         }
-
-
 
         // POST: /Submission/Edit/5
         [HttpPost]

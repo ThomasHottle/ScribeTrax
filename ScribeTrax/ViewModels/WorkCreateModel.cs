@@ -11,8 +11,7 @@ namespace ScribeTrax.ViewModels
         [Required]
         public string Type { get; set; }
 
-        [Required]
-        public int BylineId { get; set; }
+        public int? BylineId { get; set; }
 
         public int? GenreId { get; set; }
     }

@@ -13,7 +13,7 @@ namespace ScribeTrax.Interfaces
             IEnumerable<Genre> GetAllGenres();
 
             // Optional: Add methods for creation, update, or deletion
-            void CreateWork(Work work);
+            void CreateWork(WorkCreateModel work);
             void UpdateWork(Work work);
             void DeleteWork(int id);
     }

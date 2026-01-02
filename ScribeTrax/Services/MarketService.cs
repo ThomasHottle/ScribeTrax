@@ -46,7 +46,7 @@ namespace ScribeTrax.Services
                 .ToList();
         }
 
-        public void CreateMarket(MarketViewModel model)
+        public int CreateMarket(MarketViewModel model)
         {
             var entity = new Market
             {
@@ -60,6 +60,8 @@ namespace ScribeTrax.Services
 
             _context.Markets.Add(entity);
             _context.SaveChanges();
+
+            return entity.MarketId; // <-- This is the missing piece
         }
 
 

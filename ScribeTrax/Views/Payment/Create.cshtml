@@ -3,27 +3,22 @@
 @{
     ViewData["Title"] = "Create Payment";
 }
-
 <h1>Create Payment</h1>
 
 <hr />
 
 <form asp-action="Create" method="post">
+    <!-- Work dropdown -->
     <div class="form-group">
         <label asp-for="WorkId" class="control-label"></label>
-        <select asp-for="WorkId" class="form-control" asp-items="ViewBag.Works">
-            <option value="">-- Select Work --</option>
-        </select>
+        <select asp-for="WorkId" class="form-control" asp-items="ViewBag.Works"></select>
         <span asp-validation-for="WorkId" class="text-danger"></span>
     </div>
 
-
-
+    <!-- Market dropdown -->
     <div class="form-group">
         <label asp-for="MarketId" class="control-label"></label>
-        <select asp-for="MarketId" class="form-control" asp-items="ViewBag.Markets">
-            <option value="">-- Select Market --</option>
-        </select>
+        <select asp-for="MarketId" class="form-control" asp-items="ViewBag.Markets"></select>
         <span asp-validation-for="MarketId" class="text-danger"></span>
     </div>
 
@@ -47,13 +42,14 @@
         <span asp-validation-for="PaymentDate" class="text-danger"></span>
     </div>
 
+    <!-- Payment Type dropdown -->
     <div class="form-group">
         <label asp-for="PaymentTypeId" class="control-label"></label>
-        <select asp-for="PaymentTypeId" class="form-control" asp-items="ViewBag.PaymentTypes">
-            <option value="">-- Select Payment Type --</option>
-        </select>
+        <select asp-for="PaymentTypeId" class="form-control" asp-items="ViewBag.PaymentTypes"></select>
         <span asp-validation-for="PaymentTypeId" class="text-danger"></span>
     </div>
+
+
 
 
 

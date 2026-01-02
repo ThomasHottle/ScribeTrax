@@ -4,7 +4,7 @@ namespace ScribeTrax.Models
 {
     public class Submission
     {
-        public int SubmissionId { get; set; }
+        public int? SubmissionId { get; set; }
         public int? WorkId { get; set; }
         public int? BylineId { get; set; }
         public int? MarketId { get; set; }

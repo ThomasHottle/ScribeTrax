@@ -9,6 +9,12 @@
 </div>
 
 <h3>Works</h3>
+<a asp-controller="Work"
+   asp-action="Create"
+   asp-route-bylineId="@Model.BylineId"
+   class="btn btn-primary">
+    Create New Work
+</a>
 @if (Model.Works != null && Model.Works.Any())
 {
     <table class="table">

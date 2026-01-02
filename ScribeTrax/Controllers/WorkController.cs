@@ -33,15 +33,20 @@ namespace ScribeTrax.Controllers
         }
 
         // GET: /Work/Create
-        public IActionResult Create()
+        public IActionResult Create(int? bylineId)
         {
             var bylines = _workService.GetAllBylines();
             var genres = _workService.GetAllGenres();
 
-            ViewBag.Bylines = new SelectList(bylines, "BylineId", "Name");
+            ViewBag.Bylines = new SelectList(bylines, "BylineId", "Name", bylineId);
             ViewBag.Genres = new SelectList(genres, "GenreId", "Name");
 
-            return View();
+            var model = new WorkCreateModel
+            {
+                BylineId = bylineId
+            };
+
+            return View(model);
         }
 
         // POST: /Work/Create
@@ -49,17 +54,18 @@ namespace ScribeTrax.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(WorkCreateModel model)
         {
-            if (!ModelState.IsValid) return View(model);
-
-            var entity = new Work
+            if (!ModelState.IsValid)
             {
-                Title = model.Title,
-                Type = model.Type,
-                BylineId = model.BylineId,
-                GenreId = model.GenreId
-            };
+                var bylines = _workService.GetAllBylines();
+                var genres = _workService.GetAllGenres();
 
-            _workService.CreateWork(entity);
+                ViewBag.Bylines = new SelectList(bylines, "BylineId", "Name", model.BylineId);
+                ViewBag.Genres = new SelectList(genres, "GenreId", "Name", model.GenreId);
+
+                return View(model);
+            }
+
+            _workService.CreateWork(model);
             return RedirectToAction(nameof(Index));
         }
 

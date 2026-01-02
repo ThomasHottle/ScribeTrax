@@ -6,10 +6,10 @@ namespace ScribeTrax.ViewModels
 { 
     public class SubmissionViewModel
     {
-        public int SubmissionId { get; set; }
-        public int WorkId { get; set; }
+        public int? SubmissionId { get; set; }
+        public int? WorkId { get; set; }
         public int? BylineId { get; set; }
-        public int MarketId { get; set; }
+        public int? MarketId { get; set; }
         public DateTime? SubmissionDate { get; set; }
         public string Status { get; set; }
         public int? PaymentTypeId { get; set; }
